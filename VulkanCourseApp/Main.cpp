@@ -16,6 +16,11 @@ int main()
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	GLFWwindow* window = glfwCreateWindow(1920, 1080, "Test Window", nullptr, nullptr);
 
+	uint32_t extensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+
+	printf("Extension count: %i\n", extensionCount);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
