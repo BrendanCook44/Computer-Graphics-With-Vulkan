@@ -9,25 +9,42 @@
 
 #include <iostream>
 
-int main()
+#include "VulkanRenderer.h"
+
+GLFWwindow* mainWindow;
+VulkanRenderer vulkanRenderer;
+
+void initWindow(std::string windowName = "Test Window", const int width = 1920, const int height = 1080)
 {
+	// Initialize GLFW
 	glfwInit();
 
+	// Set GLFW to NOT work with OpenGL
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	GLFWwindow* window = glfwCreateWindow(1920, 1080, "Test Window", nullptr, nullptr);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+	mainWindow = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
+}
 
-	printf("Extension count: %i\n", extensionCount);
+int main()
+{
+	// Create Window
+	initWindow("Test Window", 1920, 1080);
 
-	while (!glfwWindowShouldClose(window))
+	// Create Vulkan Renderer Instance
+	if (vulkanRenderer.init(mainWindow) == EXIT_FAILURE)
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Loop until closed
+	while (!glfwWindowShouldClose(mainWindow))
 	{
 		glfwPollEvents();
 	}
 
-	glfwDestroyWindow(window);
-
+	// Destroy GLFW Window and stop GLFW
+	glfwDestroyWindow(mainWindow);
 	glfwTerminate();
 
 	return 0;
