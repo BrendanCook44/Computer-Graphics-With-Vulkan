@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Utilities.h"
+
 class VulkanRenderer
 {
 public:
@@ -13,6 +15,7 @@ public:
 	VulkanRenderer();
 
 	int init(GLFWwindow* newWindow);
+	void cleanup();
 
 
 	~VulkanRenderer();
@@ -22,10 +25,31 @@ private:
 
 	// Vulkan Components
 	VkInstance instance;
+	struct
+	{
+		VkPhysicalDevice physicalDevice;
+		VkDevice logicalDevice;
+	} mainDevice;
+
+	VkQueue graphicsQueue;
 
 
-	// Vulkan Functions
+	// ----Vulkan Functions----
+
+	// Create Functions
 	void createInstance();
+	void createLogicalDevice();
+
+	// Get Functions
+	void getPhysicalDevice();
+
+	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+
+	// Support Functions
+	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	bool checkDeviceSuitable(VkPhysicalDevice device);
+
+	// Checker Functions
 
 };
 
