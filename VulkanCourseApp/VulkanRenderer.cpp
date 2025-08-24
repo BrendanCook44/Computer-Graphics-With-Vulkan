@@ -145,7 +145,7 @@ void VulkanRenderer::getPhysicalDevice()
 	std::vector<VkPhysicalDevice> deviceList(deviceCount);
 	vkEnumeratePhysicalDevices(instance, &deviceCount, deviceList.data());
 
-	// Temperary: Pick First In List
+	// Check for device containing graphics queue family
 	for (const auto& device : deviceList)
 	{
 		if (checkDeviceSuitable(device))
