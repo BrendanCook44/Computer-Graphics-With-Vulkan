@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 
 #include "Utilities.h"
 
@@ -33,12 +34,16 @@ private:
 
 	VkQueue graphicsQueue;
 
+	// Debug Components
+	VkDebugUtilsMessengerEXT debugMessenger;
+
 
 	// ----Vulkan Functions----
 
 	// Create Functions
 	void createInstance();
 	void createLogicalDevice();
+	void setupDebugMessenger();
 
 	// Get Functions
 	void getPhysicalDevice();
@@ -48,6 +53,17 @@ private:
 	// Support Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
 	bool checkDeviceSuitable(VkPhysicalDevice device);
+	bool checkValidationLayerSupport(std::vector<const char*>* checkValidationLayers);
+
+	// Debug Functions
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT messageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pUserData);
+
+	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
 	// Checker Functions
 
