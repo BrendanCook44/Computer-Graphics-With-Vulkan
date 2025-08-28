@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
+// Add common constants here as needed
+const uint32_t WIDTH = 1920;
+const uint32_t HEIGHT = 1080;

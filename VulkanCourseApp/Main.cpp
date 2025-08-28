@@ -11,10 +11,12 @@
 
 #include "VulkanRenderer.h"
 
+#include "CommonValues.h"
+
 GLFWwindow* mainWindow;
 VulkanRenderer vulkanRenderer;
 
-void initWindow(std::string windowName = "Test Window", const int width = 1920, const int height = 1080)
+void initWindow(std::string windowName = "Test Window")
 {
 	// Initialize GLFW
 	glfwInit();
@@ -23,13 +25,13 @@ void initWindow(std::string windowName = "Test Window", const int width = 1920, 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	mainWindow = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
+	mainWindow = glfwCreateWindow(WIDTH, HEIGHT, windowName.c_str(), nullptr, nullptr);
 }
 
 int main()
 {
 	// Create Window
-	initWindow("Test Window", 1920, 1080);
+	initWindow("Test Window");
 
 	// Create Vulkan Renderer Instance
 	if (vulkanRenderer.init(mainWindow) == EXIT_FAILURE)
