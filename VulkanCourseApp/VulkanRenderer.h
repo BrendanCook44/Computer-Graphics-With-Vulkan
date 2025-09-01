@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 #include <vector>
-#include <iostream>
+#include <set>
 
 #include "Utilities.h"
 #include "VulkanValidation.h"
@@ -34,27 +34,29 @@ private:
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	VkQueue presentationQueue;
+	VkSurfaceKHR surface;
+
 
 	// Validation Layer Handler
 	VulkanValidation vulkanValidation;
 
-
-	// ----Vulkan Functions----
-
 	// Create Functions
 	void createInstance();
 	void createLogicalDevice();
+	void createSurface();
 
 	// Get Functions
 	void getPhysicalDevice();
-
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 
-	// Support Functions
+	// Checker Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 
-	// Checker Functions
+
+
 
 };
 
