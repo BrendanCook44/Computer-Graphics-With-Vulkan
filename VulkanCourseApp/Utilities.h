@@ -22,5 +22,9 @@ struct SwapchainDetails {
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;			// Surface Properties
 	std::vector<VkSurfaceFormatKHR> formats;				// Surface image formats
 	std::vector<VkPresentModeKHR> presentationModes;		// How images should be presented to screen
+};
 
+struct SwapchainImage {
+	VkImage image;
+	VkImageView imageView;
 };

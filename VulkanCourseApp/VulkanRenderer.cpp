@@ -283,12 +283,63 @@ void VulkanRenderer::createSwapchain()
 	// If old swapchain has been destroyed and this one replaces it, then link old one to quickly hand over responsibilities
 	swapchainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
+	// Create swapchain
 	VkResult result = vkCreateSwapchainKHR(mainDevice.logicalDevice, &swapchainCreateInfo, nullptr, &swapchain);
-
 	if (result != VK_SUCCESS)
 	{
 		throw std::runtime_error("Failed to create a swapchain!");
 	}
+
+	swapchainImageFormat = surfaceFormat.format;
+	swapchainExtent = extent;
+
+	// Get swapchain images
+	uint32_t swapchainImageCount;
+	vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, nullptr);
+	std::vector<VkImage> images(swapchainImageCount);
+	vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, images.data());
+
+	for (VkImage image : images)
+	{
+		// Store image handle
+		SwapchainImage swapchainImage = {};
+		swapchainImage.image = image;
+
+		// Create image view and add to swapchain image list
+		swapchainImage.imageView = createImageView(image, swapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+		swapchainImages.push_back(swapchainImage);
+	}
+}
+
+VkImageView VulkanRenderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
+{
+	VkImageViewCreateInfo viewCreateInfo = {};
+	viewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewCreateInfo.image = image;																		// Image to create view for
+	viewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;													// Type of image
+	viewCreateInfo.format = format;																		// Format of image data
+	viewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;										// Allows remapping of rgba components to other rgba components
+	viewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+	// Subresources allow the view to view only a part of an image
+	viewCreateInfo.subresourceRange.aspectMask = aspectFlags;											// Which aspect of the image to view
+	viewCreateInfo.subresourceRange.baseMipLevel = 0;													// Start mipmap level to view from
+	viewCreateInfo.subresourceRange.levelCount = 1;														// Number of mipmap levels to view
+	viewCreateInfo.subresourceRange.baseArrayLayer = 0;													// Start array level to view from
+	viewCreateInfo.subresourceRange.layerCount = 1;														// Number of array levels to view
+
+	// Create image view and return it
+	VkImageView imageView;
+	VkResult result = vkCreateImageView(mainDevice.logicalDevice, &viewCreateInfo, nullptr, &imageView);
+
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create an Image View!");
+	}
+
+	return imageView;
 }
 
 void VulkanRenderer::getPhysicalDevice()
@@ -515,6 +566,12 @@ VkExtent2D VulkanRenderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& surf
 
 void VulkanRenderer::cleanup()
 {
+
+	for (auto image : swapchainImages)
+	{
+		vkDestroyImageView(mainDevice.logicalDevice, image.imageView, nullptr);
+	}
+
 	vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
 
 	if (surface != VK_NULL_HANDLE)

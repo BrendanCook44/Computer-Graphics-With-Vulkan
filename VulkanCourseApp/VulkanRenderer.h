@@ -38,7 +38,10 @@ private:
 	VkQueue presentationQueue;
 	VkSurfaceKHR surface;
 	VkSwapchainKHR swapchain;
+	std::vector<SwapchainImage> swapchainImages;
 
+	VkFormat swapchainImageFormat;
+	VkExtent2D swapchainExtent;
 
 	// Validation Layer Handler
 	VulkanValidation vulkanValidation;
@@ -48,6 +51,8 @@ private:
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapchain();
+
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 	// Get Functions
 	void getPhysicalDevice();
