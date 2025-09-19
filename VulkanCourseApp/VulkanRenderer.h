@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <array>
 
 #include "Utilities.h"
 #include "VulkanValidation.h"
@@ -40,6 +41,12 @@ private:
 	VkSwapchainKHR swapchain;
 	std::vector<SwapchainImage> swapchainImages;
 
+	// Pipeline
+	VkPipeline graphicsPipeline;
+	VkPipelineLayout pipelineLayout;
+	VkRenderPass renderPass;
+
+	// Utility
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
 
@@ -51,6 +58,7 @@ private:
 	void createLogicalDevice();
 	void createSurface();
 	void createSwapchain();
+	void createRenderPass();
 	void createGraphicsPipeline();
 
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
