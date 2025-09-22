@@ -19,6 +19,7 @@ public:
 	VulkanRenderer();
 
 	int init(GLFWwindow* newWindow);
+	void draw();
 	void cleanup();
 
 
@@ -26,6 +27,7 @@ public:
 
 private:
 	GLFWwindow* window;
+	int currentFrame = 0;
 
 	// Vulkan Components
 	VkInstance instance;
@@ -56,6 +58,11 @@ private:
 	VkFormat swapchainImageFormat;
 	VkExtent2D swapchainExtent;
 
+	// Synchronization
+	std::vector<VkSemaphore> imageAvailable;
+	std::vector<VkSemaphore> renderFinished;
+	std::vector<VkFence> drawFences;
+
 	// Validation Layer Handler
 	VulkanValidation vulkanValidation;
 
@@ -69,6 +76,7 @@ private:
 	void createFramebuffers();
 	void createCommandPool();
 	void createCommandBuffers();
+	void createSynchronization();
 
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -90,6 +98,7 @@ private:
 	VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &formats);
 	VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR> presentationModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &surfaceCapabilities);
+
 
 
 
