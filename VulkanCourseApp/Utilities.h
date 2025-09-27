@@ -1,18 +1,25 @@
 #pragma once
 
 #include <fstream>
+#include <glm/glm.hpp>
 
-const int MAX_FRAME_DRAWS = 2;
+const int MAX_FRAME_DRAWS = 3;
 
 const std::vector<const char*> deviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
+struct Vertex
+{
+	glm::vec3 position;										// Vertex Position (x, y, z)
+
+};
+
 // Indices (locations) of Queue Families (if they exist)
 struct QueueFamilyIndices
 {
-	int graphicsFamily = -1;			// Location of Graphics Queue Family
-	int presentationFamily = -1;		// Location of Presentation Queue Family
+	int graphicsFamily = -1;								// Location of Graphics Queue Family
+	int presentationFamily = -1;							// Location of Presentation Queue Family
 
 
 	// Check if queue families are valid

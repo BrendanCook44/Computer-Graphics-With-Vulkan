@@ -11,6 +11,7 @@
 
 #include "Utilities.h"
 #include "VulkanValidation.h"
+#include "Mesh.h"
 
 class VulkanRenderer
 {
@@ -28,6 +29,9 @@ public:
 private:
 	GLFWwindow* window;
 	int currentFrame = 0;
+
+	// Scene Objects
+	Mesh mesh1;
 
 	// Vulkan Components
 	VkInstance instance;
