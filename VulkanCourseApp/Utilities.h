@@ -11,7 +11,8 @@ const std::vector<const char*> deviceExtensions = {
 
 struct Vertex
 {
-	glm::vec3 position;										// Vertex Position (x, y, z)
+	glm::vec3 position;										// Vertex Position (XYZ)
+	glm::vec3 color;										// Vertex Color (RGB)
 
 };
 
