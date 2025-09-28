@@ -33,14 +33,14 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 
 		// Create a mesh
 		// Vertex data
-		std::vector<Vertex> meshVertices = {
+		std::vector<Vertex> leftRectangleVertices = {
 			{{-0.1, -0.4, 0.0}, {1.0f, 0.0f, 0.0f}},													// 0
 			{{-0.1, 0.4, 0.0}, {0.0f, 1.0f, 0.0f}},														// 1
 			{{-0.9, 0.4, 0.0}, {0.0f, 0.0f, 1.0f}},														// 2
 			{{-0.9, -0.4, 0.0}, {1.0f, 1.0f, 0.0f}},													// 3
 		};
 
-		std::vector<Vertex> meshVertices2 = {
+		std::vector<Vertex> rightRectangleVertices = {
 			{{0.9, -0.4, 0.0}, {1.0f, 0.0f, 0.0f}},														// 0
 			{{0.9, 0.4, 0.0}, {0.0f, 1.0f, 0.0f}},														// 1
 			{{0.1, 0.4, 0.0}, {0.0f, 0.0f, 1.0f}},														// 2
@@ -53,11 +53,11 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 			2, 3, 0
 		};
 
-		Mesh mesh1 = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &meshVertices, &meshIndices);
-		Mesh mesh2 = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &meshVertices2, &meshIndices);
+		Mesh leftRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &leftRectangleVertices, &meshIndices);
+		Mesh rightRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &rightRectangleVertices, &meshIndices);
 
-		meshList.push_back(mesh1);
-		meshList.push_back(mesh2);
+		meshList.push_back(leftRectangle);
+		meshList.push_back(rightRectangle);
 
 		recordCommands();
 		createSynchronization();
