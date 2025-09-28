@@ -11,16 +11,16 @@ const std::vector<const char*> deviceExtensions = {
 
 struct Vertex
 {
-	glm::vec3 position;										// Vertex Position (XYZ)
-	glm::vec3 color;										// Vertex Color (RGB)
+	glm::vec3 position;																												// Vertex Position (XYZ)
+	glm::vec3 color;																												// Vertex Color (RGB)
 
 };
 
 // Indices (locations) of Queue Families (if they exist)
 struct QueueFamilyIndices
 {
-	int graphicsFamily = -1;								// Location of Graphics Queue Family
-	int presentationFamily = -1;							// Location of Presentation Queue Family
+	int graphicsFamily = -1;																										// Location of Graphics Queue Family
+	int presentationFamily = -1;																									// Location of Presentation Queue Family
 
 
 	// Check if queue families are valid
@@ -32,9 +32,9 @@ struct QueueFamilyIndices
 
 struct SwapchainDetails 
 {
-	VkSurfaceCapabilitiesKHR surfaceCapabilities;			// Surface Properties
-	std::vector<VkSurfaceFormatKHR> formats;				// Surface image formats
-	std::vector<VkPresentModeKHR> presentationModes;		// How images should be presented to screen
+	VkSurfaceCapabilitiesKHR surfaceCapabilities;																					// Surface Properties
+	std::vector<VkSurfaceFormatKHR> formats;																						// Surface image formats
+	std::vector<VkPresentModeKHR> presentationModes;																				// How images should be presented to screen
 };
 
 struct SwapchainImage 
@@ -70,4 +70,59 @@ static std::vector<char> readFile(const std::string& filename)
 	file.close();
 
 	return fileBuffer;
+}
+
+static uint32_t findMemoryTypeIndex(VkPhysicalDevice physicalDevice, uint32_t allowedTypes, VkMemoryPropertyFlags properties)
+{
+	// Get properties of physical device memory
+	VkPhysicalDeviceMemoryProperties memoryProperties;
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+
+	for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+	{
+		if ((allowedTypes & (1 << i))																								// Index of memory type must match corresponding bit in allowedTypes
+			&& (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)											// Desired property bit flags are part of memory type's property flags
+		{
+			// Return the index of the valid memory type
+			return i;
+		}
+	}
+}
+
+static void createBuffer(VkPhysicalDevice physicalDevice, VkDevice logicalDevice, VkDeviceSize bufferSize, VkBufferUsageFlags bufferUsage, VkMemoryPropertyFlags bufferProperties, VkBuffer* buffer, VkDeviceMemory* bufferMemory)
+{
+	// Information to create a buffer
+	VkBufferCreateInfo bufferCreateInfo = {};
+	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferCreateInfo.size = bufferSize;																								// Size of buffer (size of 1 vertex * number of vertices)
+	bufferCreateInfo.usage = bufferUsage;																							// Buffer Usage Flags
+	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;																		// Choose sharing mode
+
+	VkResult result = vkCreateBuffer(logicalDevice, &bufferCreateInfo, nullptr, buffer);
+
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create Vertex Buffer!");
+	}
+
+	// Get buffer memory requirements
+	VkMemoryRequirements memoryRequirements;
+	vkGetBufferMemoryRequirements(logicalDevice, *buffer, &memoryRequirements);
+
+	// Allocate memory to buffer
+	VkMemoryAllocateInfo memoryAllocateInfo = {};
+	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memoryAllocateInfo.allocationSize = memoryRequirements.size;
+	memoryAllocateInfo.memoryTypeIndex = findMemoryTypeIndex(physicalDevice, memoryRequirements.memoryTypeBits, bufferProperties);	// Index of memory type on Physical Device that has required bit flags);																		// VK_MEMORY_PROPERTY_HOST_COHERENT_BIT: Allows pacement of data straight into buffer after mapping
+
+	// Allocate memory to VkDeviceMemory
+	result = vkAllocateMemory(logicalDevice, &memoryAllocateInfo, nullptr, bufferMemory);
+
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate Vertex Buffer Memory!");
+	}
+
+	// Allocate memory to given vertex buffer
+	vkBindBufferMemory(logicalDevice, *buffer, *bufferMemory, 0);
 }

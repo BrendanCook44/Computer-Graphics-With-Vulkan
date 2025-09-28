@@ -15,8 +15,6 @@ void VulkanValidation::setupDebugMessenger(VkInstance instance)
     if (createDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
         throw std::runtime_error("Failed to set up debug messenger!");
     }
-
-    std::cout << "Debug messenger set up successfully." << std::endl;
 }
 
 bool VulkanValidation::checkValidationLayerSupport(const std::vector<const char*>& validationLayers)
