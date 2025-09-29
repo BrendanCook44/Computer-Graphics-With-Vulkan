@@ -2,6 +2,8 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <stdexcept>
 #include <vector>
@@ -9,9 +11,9 @@
 #include <algorithm>
 #include <array>
 
-#include "Utilities.h"
 #include "VulkanValidation.h"
 #include "Mesh.h"
+#include "Utilities.h"
 
 class VulkanRenderer
 {
@@ -20,6 +22,7 @@ public:
 	VulkanRenderer();
 
 	int init(GLFWwindow* newWindow);
+	void updateModel(glm::mat4 newModel);
 	void draw();
 	void cleanup();
 
@@ -32,6 +35,14 @@ private:
 
 	// Scene Objects
 	std::vector<Mesh> meshList;
+
+	// Scene Settings
+	struct ModelViewProjection
+	{
+		glm::mat4 projection;
+		glm::mat4 view;
+		glm::mat4 model;
+	} ModelViewProjection;
 
 	// Vulkan Components
 	VkInstance instance;
@@ -50,6 +61,13 @@ private:
 	std::vector<VkFramebuffer> swapchainFramebuffers;
 	std::vector<VkCommandBuffer> commandBuffers;
 
+	// Descriptors
+	VkDescriptorSetLayout descriptorSetLayout;
+	std::vector<VkDescriptorSet> descriptorSets;
+
+	std::vector<VkBuffer> uniformBuffer;
+	std::vector<VkDeviceMemory> uniformBufferMemory;
+
 	// Pipeline
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
@@ -57,6 +75,7 @@ private:
 
 	// Pools
 	VkCommandPool graphicsCommandPool;
+	VkDescriptorPool descriptorPool;
 
 	// Utility
 	VkFormat swapchainImageFormat;
@@ -76,11 +95,19 @@ private:
 	void createSurface();
 	void createSwapchain();
 	void createRenderPass();
+	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
 	void createFramebuffers();
 	void createCommandPool();
 	void createCommandBuffers();
 	void createSynchronization();
+
+	void createUniformBuffers();
+	void createDescriptorPool();
+	void createDescriptorSets();
+
+	// Update Functions
+	void updateUniformBuffer(uint32_t imageIndex);
 
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
