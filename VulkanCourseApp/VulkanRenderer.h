@@ -22,7 +22,7 @@ public:
 	VulkanRenderer();
 
 	int init(GLFWwindow* newWindow);
-	void updateModel(glm::mat4 newModel);
+	void updateModel(int modelId, glm::mat4 newModel);
 	void draw();
 	void cleanup();
 
@@ -37,12 +37,11 @@ private:
 	std::vector<Mesh> meshList;
 
 	// Scene Settings
-	struct ModelViewProjection
+	struct ViewProjection
 	{
 		glm::mat4 projection;
 		glm::mat4 view;
-		glm::mat4 model;
-	} ModelViewProjection;
+	} viewProjection;
 
 	// Vulkan Components
 	VkInstance instance;
@@ -65,8 +64,15 @@ private:
 	VkDescriptorSetLayout descriptorSetLayout;
 	std::vector<VkDescriptorSet> descriptorSets;
 
-	std::vector<VkBuffer> uniformBuffer;
-	std::vector<VkDeviceMemory> uniformBufferMemory;
+	std::vector<VkBuffer> viewProjectionUniformBuffer;
+	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
+
+	std::vector<VkBuffer> modelDynamicUniformBuffer;
+	std::vector<VkDeviceMemory> modelDynamicUniformBufferMemory;
+
+	VkDeviceSize minUniformBufferOffset;
+	size_t modelUniformAlignment;
+	UniformBufferObjectModel* modelTransferSpace;
 
 	// Pipeline
 	VkPipeline graphicsPipeline;
@@ -107,7 +113,7 @@ private:
 	void createDescriptorSets();
 
 	// Update Functions
-	void updateUniformBuffer(uint32_t imageIndex);
+	void updateUniformBuffers(uint32_t imageIndex);
 
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -119,6 +125,9 @@ private:
 	void getPhysicalDevice();
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 	SwapchainDetails getSwapchainDetails(VkPhysicalDevice device);
+
+	// Allocate Functions
+	void allocateDynamicBufferTransferSpace();
 
 	// Checker Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);

@@ -13,6 +13,8 @@ Mesh::Mesh(VkPhysicalDevice newPhysicalDevice, VkDevice newLogicalDevice, VkQueu
 	indexCount = indices->size();
 	createVertexBuffer(transferQueue, transferCommandPool, vertices);
 	createIndexBuffer(transferQueue, transferCommandPool, indices);
+
+	uniformBufferObjectModel.model = glm::mat4(1.0f);
 }
 
 void Mesh::createVertexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<Vertex>* vertices)
@@ -112,6 +114,16 @@ void Mesh::destroyIndexBuffer()
 {
 	vkDestroyBuffer(logicalDevice, indexBuffer, nullptr);
 	vkFreeMemory(logicalDevice, indexBufferMemory, nullptr);
+}
+
+void Mesh::setModel(glm::mat4 newModel)
+{
+	uniformBufferObjectModel.model = newModel;
+}
+
+UniformBufferObjectModel Mesh::getModel()
+{
+	return uniformBufferObjectModel;
 }
 
 Mesh::~Mesh() 
