@@ -62,17 +62,20 @@ private:
 
 	// Descriptors
 	VkDescriptorSetLayout descriptorSetLayout;
+	VkPushConstantRange pushConstantRange;
+
+	VkDescriptorPool descriptorPool;
 	std::vector<VkDescriptorSet> descriptorSets;
 
 	std::vector<VkBuffer> viewProjectionUniformBuffer;
 	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
 
-	std::vector<VkBuffer> modelDynamicUniformBuffer;
-	std::vector<VkDeviceMemory> modelDynamicUniformBufferMemory;
+	//std::vector<VkBuffer> modelDynamicUniformBuffer;
+	//std::vector<VkDeviceMemory> modelDynamicUniformBufferMemory;
 
-	VkDeviceSize minUniformBufferOffset;
-	size_t modelUniformAlignment;
-	UniformBufferObjectModel* modelTransferSpace;
+	//VkDeviceSize minUniformBufferOffset;
+	//size_t modelUniformAlignment;
+	// UniformBufferObjectModel* modelTransferSpace;
 
 	// Pipeline
 	VkPipeline graphicsPipeline;
@@ -81,7 +84,6 @@ private:
 
 	// Pools
 	VkCommandPool graphicsCommandPool;
-	VkDescriptorPool descriptorPool;
 
 	// Utility
 	VkFormat swapchainImageFormat;
@@ -102,6 +104,7 @@ private:
 	void createSwapchain();
 	void createRenderPass();
 	void createDescriptorSetLayout();
+	void createPushConstantRange();
 	void createGraphicsPipeline();
 	void createFramebuffers();
 	void createCommandPool();
@@ -119,7 +122,7 @@ private:
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
 	// Record Functions
-	void recordCommands();
+	void recordCommands(uint32_t currentImage);
 
 	// Get Functions
 	void getPhysicalDevice();
@@ -127,7 +130,7 @@ private:
 	SwapchainDetails getSwapchainDetails(VkPhysicalDevice device);
 
 	// Allocate Functions
-	void allocateDynamicBufferTransferSpace();
+	//void allocateDynamicBufferTransferSpace();
 
 	// Checker Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);

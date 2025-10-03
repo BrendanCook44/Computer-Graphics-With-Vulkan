@@ -7,7 +7,7 @@
 
 #include "Utilities.h"
 
-struct UniformBufferObjectModel {
+struct Model {
 	glm::mat4 model;
 };
 
@@ -26,7 +26,7 @@ public:
 	void destroyIndexBuffer();
 
 	void setModel(glm::mat4 newModel);
-	UniformBufferObjectModel getModel();
+	Model getModel();
 
 	~Mesh();
 
@@ -45,7 +45,7 @@ private:
 	VkDeviceMemory indexBufferMemory;
 	void createIndexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<uint32_t>* indices);
 
-	UniformBufferObjectModel uniformBufferObjectModel;
+	Model model;
 
 };
 
