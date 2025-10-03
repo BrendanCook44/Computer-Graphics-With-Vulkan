@@ -1023,9 +1023,6 @@ void VulkanRenderer::recordCommands(uint32_t currentImage)
 		vkCmdBindVertexBuffers(commandBuffers[currentImage], 0, 1, vertexBuffers, offsets);							// Command to bind vertex buffer before drawing with them
 		vkCmdBindIndexBuffer(commandBuffers[currentImage], meshList[j].getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);	// Command to bind index buffer before drawing with them
 
-		// Dynamic offet amount
-		// uint32_t dynamicOffset = static_cast<uint32_t>(modelUniformAlignment) * j;
-
 		// Push constants to given shader stage directly (no buffer)
 		Model meshModel = meshList[j].getModel();
 		vkCmdPushConstants(commandBuffers[currentImage], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Model), &meshModel);
