@@ -8,11 +8,6 @@ layout(binding = 0) uniform ViewProjection {
     mat4 view;
 } viewProjection;
 
-// Not In Use For Now
-layout(binding = 1) uniform UniformBufferObjectModel {
-    mat4 model;
-} uniformBufferObjectModel;
-
 layout(push_constant) uniform PushModel {
     mat4 model;
 } pushModel;
