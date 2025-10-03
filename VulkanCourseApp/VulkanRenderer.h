@@ -70,13 +70,6 @@ private:
 	std::vector<VkBuffer> viewProjectionUniformBuffer;
 	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
 
-	//std::vector<VkBuffer> modelDynamicUniformBuffer;
-	//std::vector<VkDeviceMemory> modelDynamicUniformBufferMemory;
-
-	//VkDeviceSize minUniformBufferOffset;
-	//size_t modelUniformAlignment;
-	// UniformBufferObjectModel* modelTransferSpace;
-
 	// Pipeline
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
@@ -130,7 +123,6 @@ private:
 	SwapchainDetails getSwapchainDetails(VkPhysicalDevice device);
 
 	// Allocate Functions
-	//void allocateDynamicBufferTransferSpace();
 
 	// Checker Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
