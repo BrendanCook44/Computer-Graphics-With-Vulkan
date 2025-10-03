@@ -66,7 +66,6 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		meshList.push_back(rightRectangle);
 
 		createCommandBuffers();
-		// allocateDynamicBufferTransferSpace();
 		createUniformBuffers();
 		createDescriptorPool();
 		createDescriptorSets();
