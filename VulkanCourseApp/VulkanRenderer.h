@@ -62,6 +62,7 @@ private:
 
 	// Depth Buffer
 	VkImage depthBufferImage;
+	VkFormat depthBufferFormat;
 	VkDeviceMemory depthBufferImageMemory;
 	VkImageView depthBufferImageView;
 

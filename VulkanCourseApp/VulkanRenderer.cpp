@@ -25,11 +25,11 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		getPhysicalDevice();
 		createLogicalDevice();
 		createSwapchain();
+		createDepthBufferImage();
 		createRenderPass();
 		createDescriptorSetLayout();
 		createPushConstantRange();
 		createGraphicsPipeline();
-		createDepthBufferImage();
 		createFramebuffers();
 		createCommandPool();
 
@@ -457,6 +457,7 @@ void VulkanRenderer::createRenderPass()
 
 	// Depth attachment of render pass
 	VkAttachmentDescription depthAttachment = {};
+	depthAttachment.format = depthBufferFormat;
 	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -762,7 +763,7 @@ void VulkanRenderer::createDepthBufferImage()
 	std::vector<VkFormat> formats = { VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D32_SFLOAT, VK_FORMAT_D24_UNORM_S8_UINT };
 
 	// Get supported format for depth buffer
-	VkFormat depthBufferFormat = chooseSupportedFormat(formats, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+	depthBufferFormat = chooseSupportedFormat(formats, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
 	// Create depth buffer image
 	depthBufferImage = createImage(swapchainExtent.width, swapchainExtent.height, depthBufferFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &depthBufferImageMemory);
