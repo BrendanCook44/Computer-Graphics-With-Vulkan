@@ -1127,20 +1127,21 @@ int VulkanRenderer::createTexture(std::string fileName)
 
 	textureImage = createImage(width, height, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &textureImageMemory);
 
-	// Transition image to be DST for copy operation
+	// Transition image to be DST OPTIMAL for copy operation
 	transitionImageLayout(mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, textureImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// Copy data to image
 	copyImageBuffer(mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, imageStagingBuffer, textureImage, width, height);
 
+	// Transition image to be readable for shader usage
+	transitionImageLayout(mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, textureImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
 	// Add texture data to vector for reference
 	textureImages.push_back(textureImage);
 	this->textureImageMemory.push_back(textureImageMemory);
 
-	// Destroy staging buffers
+	// Destroy staging buffers and free memory
 	vkDestroyBuffer(mainDevice.logicalDevice, imageStagingBuffer, nullptr);
-
-	// Free staging buffer memory
 	vkFreeMemory(mainDevice.logicalDevice, imageStagingBufferMemory, nullptr);
 
 	// Return the index of new texture image
