@@ -14,6 +14,7 @@
 #include "VulkanValidation.h"
 #include "Mesh.h"
 #include "Utilities.h"
+#include "stb_image.h"
 
 class VulkanRenderer
 {
@@ -76,6 +77,10 @@ private:
 	std::vector<VkBuffer> viewProjectionUniformBuffer;
 	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
 
+	// Textures
+	std::vector<VkImage> textureImages;
+	std::vector<VkDeviceMemory> textureImageMemory;
+
 	// Pipeline
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
@@ -119,9 +124,13 @@ private:
 	VkImage createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags useFlags, VkMemoryPropertyFlags propertyFlags, VkDeviceMemory* imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
+	int createTexture(std::string fileName);
 
 	// Update Functions
 	void updateUniformBuffers(uint32_t imageIndex);
+
+	// Load Functions
+	stbi_uc* loadTextureFile(std::string fileName, int& width, int& height, VkDeviceSize& imageSize);
 
 	// Record Functions
 	void recordCommands(uint32_t currentImage);
