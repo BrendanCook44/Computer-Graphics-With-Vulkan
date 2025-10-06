@@ -80,6 +80,8 @@ private:
 	// Textures
 	std::vector<VkImage> textureImages;
 	std::vector<VkDeviceMemory> textureImageMemory;
+	std::vector<VkImageView> textureImageViews;
+	VkSampler textureSampler;
 
 	// Pipeline
 	VkPipeline graphicsPipeline;
@@ -114,6 +116,7 @@ private:
 	void createFramebuffers();
 	void createCommandPool();
 	void createCommandBuffers();
+	void createTextureSampler();
 	void createSynchronization();
 
 	void createUniformBuffers();
@@ -124,6 +127,7 @@ private:
 	VkImage createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags useFlags, VkMemoryPropertyFlags propertyFlags, VkDeviceMemory* imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
+	int createTextureImage(std::string fileName);
 	int createTexture(std::string fileName);
 
 	// Update Functions

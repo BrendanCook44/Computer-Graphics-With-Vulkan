@@ -69,6 +69,7 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		meshList.push_back(rightRectangle);
 
 		createCommandBuffers();
+		createTextureSampler();
 		createUniformBuffers();
 		createDescriptorPool();
 		createDescriptorSets();
@@ -315,9 +316,9 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 	//VkPhysicalDeviceProperties deviceProperties;
 	//vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-	//// Information about what the device can do (geo shader, tess shader, wide lines, etc)
-	//VkPhysicalDeviceFeatures deviceFeatures;
-	//vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+	// Information about what the device can do (geo shader, tess shader, wide lines, etc)
+	VkPhysicalDeviceFeatures deviceFeatures;
+	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
 	QueueFamilyIndices indices = getQueueFamilies(device);
 
@@ -332,7 +333,7 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 		swapchainValid = !SwapchainDetails.presentationModes.empty() && !SwapchainDetails.formats.empty();
 	}
 
-	return indices.isValid() && extensionsSupported && swapchainValid;
+	return indices.isValid() && extensionsSupported && swapchainValid && deviceFeatures.samplerAnisotropy;
 }
 
 void VulkanRenderer::createSurface()
@@ -849,6 +850,33 @@ void VulkanRenderer::createCommandBuffers()
 
 }
 
+void VulkanRenderer::createTextureSampler()
+{
+	// Sampler Creation Info
+	VkSamplerCreateInfo samplerCreateInfo = {};
+	samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	samplerCreateInfo.magFilter = VK_FILTER_LINEAR;														// How to render a magnified image on screen
+	samplerCreateInfo.minFilter = VK_FILTER_LINEAR;														// How to render when image is minimized on screen
+	samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;									// How to handle texture wrap in U (x) direction
+	samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;									// How to handle texture wrap in V (y) direction
+	samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;									// How to handle texture wrap in W (z) direction
+	samplerCreateInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;									// Border beyond texture (only works for border clamp)
+	samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;												// Whether coordinates should be normalized (between 0 and 1)
+	samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;										// Mipmap interpolation mode
+	samplerCreateInfo.mipLodBias = 0.0f;																// Level of detail bias for mip level
+	samplerCreateInfo.minLod = 0.0f;																	// Minimum level of detail to pick mip level
+	samplerCreateInfo.maxLod = 0.0f;																	// Maximum level of detail to pick mip level
+	samplerCreateInfo.anisotropyEnable = VK_TRUE;														// Enable Anisotropy
+	samplerCreateInfo.maxAnisotropy = 16;																// Anisotropic filtering sample level
+	
+	VkResult result = vkCreateSampler(mainDevice.logicalDevice, &samplerCreateInfo, nullptr, &textureSampler);
+
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create Texture Sampler!");
+	}
+}
+
 void VulkanRenderer::createSynchronization()
 {
 
@@ -1097,7 +1125,7 @@ VkShaderModule VulkanRenderer::createShaderModule(const std::vector<char>& code)
 	return shaderModule;
 }
 
-int VulkanRenderer::createTexture(std::string fileName)
+int VulkanRenderer::createTextureImage(std::string fileName)
 {
 	// Load image file
 	int width;
@@ -1146,6 +1174,20 @@ int VulkanRenderer::createTexture(std::string fileName)
 
 	// Return the index of new texture image
 	return textureImages.size() - 1;
+}
+
+int VulkanRenderer::createTexture(std::string fileName)
+{
+	// Create texture image and get location in array
+	int textureImageLocation = createTextureImage(fileName);
+
+	// Create image view and add to list
+	VkImageView imageView = createImageView(textureImages[textureImageLocation], VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
+	textureImageViews.push_back(imageView);
+
+	// TODO: Create descriptor set here
+
+	return 0;
 }
 
 void VulkanRenderer::recordCommands(uint32_t currentImage)
@@ -1286,6 +1328,7 @@ void VulkanRenderer::createLogicalDevice()
 
 	// Physical Device Features the Logical Device will be using
 	VkPhysicalDeviceFeatures deviceFeatures = {};
+	deviceFeatures.samplerAnisotropy = VK_TRUE;															// Enable anisotropic filtering feature flag
 
 	deviceCreateInfo.pEnabledFeatures = &deviceFeatures;												// Physical Device features that the Logical Device will use
 
@@ -1472,8 +1515,11 @@ void VulkanRenderer::cleanup()
 	// Wait until no actions being run on device before destroying
 	vkDeviceWaitIdle(mainDevice.logicalDevice);
 
+	vkDestroySampler(mainDevice.logicalDevice, textureSampler, nullptr);
+
 	for (size_t i = 0; i < textureImages.size(); i++)
 	{
+		vkDestroyImageView(mainDevice.logicalDevice, textureImageViews[i], nullptr);
 		vkDestroyImage(mainDevice.logicalDevice, textureImages[i], nullptr);
 		vkFreeMemory(mainDevice.logicalDevice, textureImageMemory[i], nullptr);
 	}
