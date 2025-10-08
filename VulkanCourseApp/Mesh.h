@@ -15,7 +15,7 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(VkPhysicalDevice newPhysicalDevice, VkDevice newLogicalDevice, VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<Vertex>* vertices, std::vector<uint32_t>* indices);
+	Mesh(VkPhysicalDevice newPhysicalDevice, VkDevice newLogicalDevice, VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<Vertex>* vertices, std::vector<uint32_t>* indices, int newTextureID);
 
 	int getVertexCount();
 	VkBuffer getVertexBuffer();
@@ -27,6 +27,9 @@ public:
 
 	void setModel(glm::mat4 newModel);
 	Model getModel();
+
+	void setTextureID(int newTextureID);
+	int getTextureID();
 
 	~Mesh();
 
@@ -46,6 +49,7 @@ private:
 	void createIndexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<uint32_t>* indices);
 
 	Model model;
+	int textureID;
 
 };
 

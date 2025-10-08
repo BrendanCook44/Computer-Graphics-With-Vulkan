@@ -14,6 +14,7 @@ struct Vertex
 {
 	glm::vec3 position;																												// Vertex Position (XYZ)
 	glm::vec3 color;																												// Vertex Color (RGB)
+	glm::vec2 texture;																												// Texture coordinates (UV)
 
 };
 

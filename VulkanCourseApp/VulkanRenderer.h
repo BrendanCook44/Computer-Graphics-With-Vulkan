@@ -68,6 +68,7 @@ private:
 	VkImageView depthBufferImageView;
 
 	// Descriptors
+	// To do: separate out into view projection descriptor set layout / view projection descriptor pool
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkPushConstantRange pushConstantRange;
 
@@ -81,7 +82,12 @@ private:
 	std::vector<VkImage> textureImages;
 	std::vector<VkDeviceMemory> textureImageMemory;
 	std::vector<VkImageView> textureImageViews;
+
+	// Texture Sampler
 	VkSampler textureSampler;
+	VkDescriptorSetLayout textureSamplerSetLayout;
+	VkDescriptorPool textureSamplerDescriptorPool;
+	std::vector<VkDescriptorSet> textureSamplerDescriptorSets;
 
 	// Pipeline
 	VkPipeline graphicsPipeline;
@@ -129,6 +135,7 @@ private:
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 	int createTextureImage(std::string fileName);
 	int createTexture(std::string fileName);
+	int createTextureDescriptor(VkImageView textureImage);
 
 	// Update Functions
 	void updateUniformBuffers(uint32_t imageIndex);
