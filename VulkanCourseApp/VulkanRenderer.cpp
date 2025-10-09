@@ -1235,8 +1235,6 @@ int VulkanRenderer::createTexture(std::string fileName)
 
 	// Return location of descriptor set with texture
 	return textureDescriptorLocation;
-
-	return 0;
 }
 
 int VulkanRenderer::createTextureDescriptor(VkImageView textureImage)
