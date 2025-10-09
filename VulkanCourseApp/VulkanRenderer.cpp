@@ -1326,10 +1326,11 @@ void VulkanRenderer::recordCommands(uint32_t currentImage)
 		vkCmdPushConstants(commandBuffers[currentImage], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Model), &meshModel);
 
 		// Package descriptor sets for binding
-		std::array<VkDescriptorSet, 2> descriptorSets = { descriptorSets[currentImage], textureSamplerDescriptorSets[meshList[j].getTextureID()] };
+		int textureID = meshList[j].getTextureID();
+		std::array<VkDescriptorSet, 2> descriptorSetsToBind = { descriptorSets[currentImage], textureSamplerDescriptorSets[textureID] };
 
 		// Bind descriptor sets
-		vkCmdBindDescriptorSets(commandBuffers[currentImage], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, static_cast<uint32_t>(descriptorSets.size()), descriptorSets.data(), 0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffers[currentImage], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, static_cast<uint32_t>(descriptorSetsToBind.size()), descriptorSetsToBind.data(), 0, nullptr);
 
 		// Execute pipeline
 		vkCmdDrawIndexed(commandBuffers[currentImage], meshList[j].getIndexCount(), 1, 0, 0, 0);
