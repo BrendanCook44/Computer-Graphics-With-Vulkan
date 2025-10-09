@@ -67,8 +67,10 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		};
 
 		int giraffeTextureID = createTexture("giraffe.jpg");
+		int pandaTextureID = createTexture("panda.jpg");
+
 		Mesh leftRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &leftRectangleVertices, &meshIndices, giraffeTextureID);
-		Mesh rightRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &rightRectangleVertices, &meshIndices, giraffeTextureID);
+		Mesh rightRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &rightRectangleVertices, &meshIndices, pandaTextureID);
 
 		meshList.push_back(leftRectangle);
 		meshList.push_back(rightRectangle);
