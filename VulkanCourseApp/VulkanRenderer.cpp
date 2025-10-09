@@ -547,7 +547,7 @@ void VulkanRenderer::createDescriptorSetLayout()
 	viewProjectionLayoutCreateInfo.pBindings = layoutBindings.data();									// Array of binding infos
 
 	// Create view projection descriptor set layout
-	VkResult result = vkCreateDescriptorSetLayout(mainDevice.logicalDevice, &viewProjectionLayoutCreateInfo, nullptr, &descriptorSetLayout);
+	VkResult result = vkCreateDescriptorSetLayout(mainDevice.logicalDevice, &viewProjectionLayoutCreateInfo, nullptr, &viewProjectionDescriptorSetLayout);
 
 	if (result != VK_SUCCESS)
 	{
@@ -723,7 +723,7 @@ void VulkanRenderer::createGraphicsPipeline()
 	colorBlendingCreateInfo.pAttachments = &colorStateAttachment;
 
 	// Pipeline Layout
-	std::array<VkDescriptorSetLayout, 2> descriptorSetLayouts = { descriptorSetLayout, textureSamplerSetLayout };
+	std::array<VkDescriptorSetLayout, 2> descriptorSetLayouts = { viewProjectionDescriptorSetLayout, textureSamplerSetLayout };
 
 	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
 	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -963,7 +963,7 @@ void VulkanRenderer::createDescriptorPool()
 	poolCreateInfo.pPoolSizes = descriptorPoolSizes.data();												// Pool Sizes to create pool with
 
 	// Create descriptor pool
-	VkResult result = vkCreateDescriptorPool(mainDevice.logicalDevice, &poolCreateInfo, nullptr, &descriptorPool);
+	VkResult result = vkCreateDescriptorPool(mainDevice.logicalDevice, &poolCreateInfo, nullptr, &viewProjectionDescriptorPool);
 
 	if (result != VK_SUCCESS)
 	{	
@@ -996,19 +996,19 @@ void VulkanRenderer::createDescriptorPool()
 void VulkanRenderer::createDescriptorSets()
 {
 	// Resize descriptor set list --- 1 for every buffer
-	descriptorSets.resize(swapchainImages.size());
+	viewProjectionDescriptorSets.resize(swapchainImages.size());
 
-	std::vector<VkDescriptorSetLayout> setLayouts(swapchainImages.size(), descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> setLayouts(swapchainImages.size(), viewProjectionDescriptorSetLayout);
 
 	// Descriptor set allocation info
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo = {};
 	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	descriptorSetAllocateInfo.descriptorPool = descriptorPool;											// Pool to allocate descriptor set from
+	descriptorSetAllocateInfo.descriptorPool = viewProjectionDescriptorPool;											// Pool to allocate descriptor set from
 	descriptorSetAllocateInfo.descriptorSetCount = static_cast<uint32_t>(swapchainImages.size());		// Number of sets to allocate
 	descriptorSetAllocateInfo.pSetLayouts = setLayouts.data();											// Layouts to use to allocate sets (1-1 relationship)
 
 	// Allocate descriptor sets (multiple)
-	VkResult result = vkAllocateDescriptorSets(mainDevice.logicalDevice, &descriptorSetAllocateInfo, descriptorSets.data());
+	VkResult result = vkAllocateDescriptorSets(mainDevice.logicalDevice, &descriptorSetAllocateInfo, viewProjectionDescriptorSets.data());
 
 	if (result != VK_SUCCESS)
 	{
@@ -1027,7 +1027,7 @@ void VulkanRenderer::createDescriptorSets()
 		// Data about the connection between the binding and the buffer
 		VkWriteDescriptorSet viewProjectionSetWrite = {};
 		viewProjectionSetWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		viewProjectionSetWrite.dstSet = descriptorSets[i];												// Descriptor set to update
+		viewProjectionSetWrite.dstSet = viewProjectionDescriptorSets[i];												// Descriptor set to update
 		viewProjectionSetWrite.dstBinding = 0;															// Binding to update (matches with binding on layout/shader)
 		viewProjectionSetWrite.dstArrayElement = 0;														// Index in array to update
 		viewProjectionSetWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;						// Type of descriptor
@@ -1327,7 +1327,7 @@ void VulkanRenderer::recordCommands(uint32_t currentImage)
 
 		// Package descriptor sets for binding
 		int textureID = meshList[j].getTextureID();
-		std::array<VkDescriptorSet, 2> descriptorSetsToBind = { descriptorSets[currentImage], textureSamplerDescriptorSets[textureID] };
+		std::array<VkDescriptorSet, 2> descriptorSetsToBind = { viewProjectionDescriptorSets[currentImage], textureSamplerDescriptorSets[textureID] };
 
 		// Bind descriptor sets
 		vkCmdBindDescriptorSets(commandBuffers[currentImage], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, static_cast<uint32_t>(descriptorSetsToBind.size()), descriptorSetsToBind.data(), 0, nullptr);
@@ -1624,9 +1624,9 @@ void VulkanRenderer::cleanup()
 
 	vkFreeMemory(mainDevice.logicalDevice, depthBufferImageMemory, nullptr);
 
-	vkDestroyDescriptorPool(mainDevice.logicalDevice, descriptorPool, nullptr);
+	vkDestroyDescriptorPool(mainDevice.logicalDevice, viewProjectionDescriptorPool, nullptr);
 
-	vkDestroyDescriptorSetLayout(mainDevice.logicalDevice, descriptorSetLayout, nullptr);
+	vkDestroyDescriptorSetLayout(mainDevice.logicalDevice, viewProjectionDescriptorSetLayout, nullptr);
 
 	for (size_t i = 0; i < swapchainImages.size(); i++)
 	{

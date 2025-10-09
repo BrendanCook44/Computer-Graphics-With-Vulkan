@@ -67,14 +67,10 @@ private:
 	VkDeviceMemory depthBufferImageMemory;
 	VkImageView depthBufferImageView;
 
-	// Descriptors
-	// To do: separate out into view projection descriptor set layout / view projection descriptor pool
-	VkDescriptorSetLayout descriptorSetLayout;
-	VkPushConstantRange pushConstantRange;
-
-	VkDescriptorPool descriptorPool;
-	std::vector<VkDescriptorSet> descriptorSets;
-
+	// View Projection
+	VkDescriptorSetLayout viewProjectionDescriptorSetLayout;
+	VkDescriptorPool viewProjectionDescriptorPool;
+	std::vector<VkDescriptorSet> viewProjectionDescriptorSets;
 	std::vector<VkBuffer> viewProjectionUniformBuffer;
 	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
 
@@ -93,6 +89,7 @@ private:
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
 	VkRenderPass renderPass;
+	VkPushConstantRange pushConstantRange;
 
 	// Pools
 	VkCommandPool graphicsCommandPool;
