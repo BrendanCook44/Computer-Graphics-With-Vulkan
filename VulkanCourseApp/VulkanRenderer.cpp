@@ -47,17 +47,17 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		// Create a mesh
 		// Vertex data
 		std::vector<Vertex> leftRectangleVertices = {
-			{{-0.4, 0.4, 0.0}, {1.0f, 0.0f, 0.0f}},													// 0
-			{{-0.4, -0.4, 0.0}, {1.0f, 0.0f, 0.0f}},												// 1
-			{{0.4, -0.4, 0.0}, {1.0f, 0.0f, 0.0f}},													// 2
-			{{0.4, 0.4, 0.0}, {1.0f, 0.0f, 0.0f}},													// 3
+			{{-0.4f, 0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},		// 0
+			{{-0.4f, -0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},		// 1
+			{{0.4f, -0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},		// 2
+			{{0.4f, 0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}			// 3
 		};
 
 		std::vector<Vertex> rightRectangleVertices = {
-			{{-0.25, 0.6, 0.0}, {0.0f, 0.0f, 1.0f}},												// 0
-			{{-0.25, -0.6, 0.0}, {0.0f, 0.0f, 1.0f}},												// 1
-			{{0.25, -0.6, 0.0}, {0.0f, 0.0f, 1.0f}},												// 2
-			{{0.25, 0.6, 0.0}, {0.0f, 0.0f, 1.0f}},													// 3
+			{{-0.25f, 0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},		// 0
+			{{-0.25f, -0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},		// 1
+			{{0.25f, -0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},		// 2
+			{{0.25f, 0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}			// 3
 		};
 
 		// Index data
@@ -618,7 +618,7 @@ void VulkanRenderer::createGraphicsPipeline()
 																										// VK_VERTEX_INPUT_RATE_INSTANCE: Move to a vertex for the next instance
 
 	// How the data for an attribute is defined within a vertex
-	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions;
+	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions;
 
 	// Position Attribute
 	attributeDescriptions[0].binding = 0;																// Which binding the data is at (should be same as above)
@@ -630,7 +630,13 @@ void VulkanRenderer::createGraphicsPipeline()
 	attributeDescriptions[1].binding = 0;																
 	attributeDescriptions[1].location = 1;																
 	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;										
-	attributeDescriptions[1].offset = offsetof(Vertex, color);										
+	attributeDescriptions[1].offset = offsetof(Vertex, color);			
+
+	// Texture Attribute
+	attributeDescriptions[2].binding = 0;
+	attributeDescriptions[2].location = 2;
+	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[2].offset = offsetof(Vertex, texture);
 
 	// -- Pipeline Creation Information --
 	// Vertex Input
