@@ -5,6 +5,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <stdexcept>
 #include <vector>
 #include <set>
@@ -13,6 +17,8 @@
 
 #include "VulkanValidation.h"
 #include "Mesh.h"
+#include "Model.h"
+
 #include "Utilities.h"
 #include "stb_image.h"
 
@@ -74,6 +80,9 @@ private:
 	std::vector<VkBuffer> viewProjectionUniformBuffer;
 	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
 
+	// Models
+	std::vector<Model> modelList;
+
 	// Textures
 	std::vector<VkImage> textureImages;
 	std::vector<VkDeviceMemory> textureImageMemory;
@@ -130,9 +139,12 @@ private:
 	VkImage createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags useFlags, VkMemoryPropertyFlags propertyFlags, VkDeviceMemory* imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
+
 	int createTextureImage(std::string fileName);
 	int createTexture(std::string fileName);
 	int createTextureDescriptor(VkImageView textureImage);
+
+	void createModel(std::string modelFile);
 
 	// Update Functions
 	void updateUniformBuffers(uint32_t imageIndex);

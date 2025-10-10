@@ -1268,7 +1268,7 @@ int VulkanRenderer::createTextureDescriptor(VkImageView textureImage)
 	textureDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	textureDescriptorWrite.descriptorCount = 1;
 	textureDescriptorWrite.pImageInfo = &textureImageInfo;
-	
+
 	// Update new texture descriptor set
 	vkUpdateDescriptorSets(mainDevice.logicalDevice, 1, &textureDescriptorWrite, 0, nullptr);
 
@@ -1277,6 +1277,50 @@ int VulkanRenderer::createTextureDescriptor(VkImageView textureImage)
 
 	// Return index of latest descriptor set
 	return textureSamplerDescriptorSets.size() - 1;
+}
+
+void VulkanRenderer::createModel(std::string modelFile)
+{
+	// Import model scene
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(modelFile, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+
+	if (!scene)
+	{
+		throw std::runtime_error("Failed to load model! (" + modelFile + ")");
+	}
+
+	// Get vector of all materials with 1:1 ID placement
+	std::vector<std::string> textureNames = Model::LoadMaterials(scene);
+
+	// Conversion from the materials list IDs to Descriptor Array IDs
+	std::vector<int> materialToTexture(textureNames.size());
+
+	// Create textures for each item in textureNames
+	for (size_t i = 0; i < textureNames.size(); i++)
+	{
+
+		// If material had no texture, set a 0 to indicate no texture present
+		if (textureNames[i].empty())
+		{
+			materialToTexture[i] = 0;
+		}
+
+		// Set value to index of newly created texture
+		else
+		{
+			materialToTexture[i] = createTexture(textureNames[i]);
+		}
+	}
+
+	// Load in all meshes
+	std::vector<Mesh> models = Model::LoadNode(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, scene->mRootNode, scene, materialToTexture);
+
+	// Create model and add to list
+	Model model = Model(models);
+
+	modelList.push_back(model);
+
 }
 
 void VulkanRenderer::recordCommands(uint32_t currentImage)
@@ -1607,6 +1651,11 @@ void VulkanRenderer::cleanup()
 
 	// Wait until no actions being run on device before destroying
 	vkDeviceWaitIdle(mainDevice.logicalDevice);
+
+	for (size_t i = 0; i < modelList.size(); i++)
+	{
+		modelList[i].destroyMeshModel();
+	}
 
 	vkDestroyDescriptorPool(mainDevice.logicalDevice, textureSamplerDescriptorPool, nullptr);
 	vkDestroyDescriptorSetLayout(mainDevice.logicalDevice, textureSamplerSetLayout, nullptr);
