@@ -44,38 +44,9 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 
 		viewProjection.projection[1][1] *= -1;
 
-		// Create a mesh
-		// Vertex data
-		std::vector<Vertex> leftRectangleVertices = {
-			{{-0.4f, 0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},		// 0
-			{{-0.4f, -0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},		// 1
-			{{0.4f, -0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},		// 2
-			{{0.4f, 0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}}			// 3
-		};
+		// Create a default for no texture
+		createTexture("plain.png");
 
-		std::vector<Vertex> rightRectangleVertices = {
-			{{-0.25f, 0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},		// 0
-			{{-0.25f, -0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},		// 1
-			{{0.25f, -0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},		// 2
-			{{0.25f, 0.6f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}			// 3
-		};
-
-		// Index data
-		std::vector<uint32_t> meshIndices = {
-			0, 1, 2,
-			2, 3, 0
-		};
-
-		int giraffeTextureID = createTexture("giraffe.jpg");
-		int pandaTextureID = createTexture("panda.jpg");
-
-		Mesh leftRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &leftRectangleVertices, &meshIndices, giraffeTextureID);
-		Mesh rightRectangle = Mesh(mainDevice.physicalDevice, mainDevice.logicalDevice, graphicsQueue, graphicsCommandPool, &rightRectangleVertices, &meshIndices, pandaTextureID);
-
-		meshList.push_back(leftRectangle);
-		meshList.push_back(rightRectangle);
-
-		createModel("Models/uh60.obj");
 
 	}
 
@@ -1282,7 +1253,7 @@ int VulkanRenderer::createTextureDescriptor(VkImageView textureImage)
 	return textureSamplerDescriptorSets.size() - 1;
 }
 
-void VulkanRenderer::createModel(std::string modelFile)
+int VulkanRenderer::createModel(std::string modelFile)
 {
 	// Import model scene
 	Assimp::Importer importer;
@@ -1323,6 +1294,8 @@ void VulkanRenderer::createModel(std::string modelFile)
 	Model model = Model(models);
 
 	modelList.push_back(model);
+
+	return modelList.size() - 1;
 
 }
 
@@ -1691,12 +1664,6 @@ void VulkanRenderer::cleanup()
 	{
 		vkDestroyBuffer(mainDevice.logicalDevice, viewProjectionUniformBuffer[i], nullptr);
 		vkFreeMemory(mainDevice.logicalDevice, viewProjectionUniformBufferMemory[i], nullptr);
-	}
-
-	for (size_t i = 0; i < meshList.size(); i++)
-	{
-		meshList[i].destroyIndexBuffer();
-		meshList[i].destroyVertexBuffer();
 	}
 
 	for (size_t i = 0; i < MAX_FRAME_DRAWS; i++)

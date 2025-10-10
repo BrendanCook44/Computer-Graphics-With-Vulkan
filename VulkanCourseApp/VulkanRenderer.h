@@ -29,10 +29,12 @@ public:
 	VulkanRenderer();
 
 	int init(GLFWwindow* newWindow);
+
+	int createModel(std::string modelFile);
 	void updateModel(int modelId, glm::mat4 newModel);
+
 	void draw();
 	void cleanup();
-
 
 	~VulkanRenderer();
 
@@ -41,7 +43,7 @@ private:
 	int currentFrame = 0;
 
 	// Scene Objects
-	std::vector<Mesh> meshList;
+	std::vector<Model> modelList;
 
 	// Scene Settings
 	struct ViewProjection
@@ -79,9 +81,6 @@ private:
 	std::vector<VkDescriptorSet> viewProjectionDescriptorSets;
 	std::vector<VkBuffer> viewProjectionUniformBuffer;
 	std::vector<VkDeviceMemory> viewProjectionUniformBufferMemory;
-
-	// Models
-	std::vector<Model> modelList;
 
 	// Textures
 	std::vector<VkImage> textureImages;
@@ -143,8 +142,6 @@ private:
 	int createTextureImage(std::string fileName);
 	int createTexture(std::string fileName);
 	int createTextureDescriptor(VkImageView textureImage);
-
-	void createModel(std::string modelFile);
 
 	// Update Functions
 	void updateUniformBuffers(uint32_t imageIndex);
