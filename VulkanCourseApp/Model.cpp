@@ -65,6 +65,8 @@ std::vector<std::string> Model::LoadMaterials(const aiScene* scene)
 			}
 		}
 	}
+
+	return textureList;
 }
 
 std::vector<Mesh> Model::LoadNode(VkPhysicalDevice physicalDevice, VkDevice logicalDevice, VkQueue transferQueue, VkCommandPool transferCommandPool, aiNode* node, const aiScene* scene, std::vector<int> materialToTexture)
@@ -73,7 +75,7 @@ std::vector<Mesh> Model::LoadNode(VkPhysicalDevice physicalDevice, VkDevice logi
 
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
-		meshList.push_back(LoadMesh(physicalDevice, logicalDevice, transferQueue, transferCommandPool, scene->mMeshes[node->mMeshes[i]], scene, materialToTexture));
+		meshList.push_back(Model::LoadMesh(physicalDevice, logicalDevice, transferQueue, transferCommandPool, scene->mMeshes[node->mMeshes[i]], scene, materialToTexture));
 	}
 
 	// Go through each node attached to this node and load it, then append their meshes to this node's mesh list

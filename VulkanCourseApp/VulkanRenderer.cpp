@@ -74,6 +74,8 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 
 		meshList.push_back(leftRectangle);
 		meshList.push_back(rightRectangle);
+
+		createModel("Models/uh60.obj");
 	}
 
 	catch (const std::runtime_error &e)
@@ -88,12 +90,12 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 
 void VulkanRenderer::updateModel(int modelId, glm::mat4 newModel)
 {
-	if (modelId > meshList.size())
+	if (modelId >= modelList.size())
 	{
 		return;
 	}
 
-	meshList[modelId].setModel(newModel);
+	modelList[modelId].setModel(newModel);
 }
 
 void VulkanRenderer::draw()
@@ -580,7 +582,7 @@ void VulkanRenderer::createPushConstantRange()
 	// Define push constant values
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;											// Shader stage push constant will go to
 	pushConstantRange.offset = 0;																		// Offset into given data to pass to push constant
-	pushConstantRange.size = sizeof(Model);																// Size of data being passed
+	pushConstantRange.size = sizeof(TransformationMatrix);																// Size of data being passed
 }
 
 void VulkanRenderer::createGraphicsPipeline()
@@ -1368,8 +1370,8 @@ void VulkanRenderer::recordCommands(uint32_t currentImage)
 		vkCmdBindIndexBuffer(commandBuffers[currentImage], meshList[j].getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);	// Command to bind index buffer before drawing with them
 
 		// Push constants to given shader stage directly (no buffer)
-		Model meshModel = meshList[j].getModel();
-		vkCmdPushConstants(commandBuffers[currentImage], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Model), &meshModel);
+		TransformationMatrix meshModel = meshList[j].getModel();
+		vkCmdPushConstants(commandBuffers[currentImage], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(TransformationMatrix), &meshModel);
 
 		// Package descriptor sets for binding
 		int textureID = meshList[j].getTextureID();
