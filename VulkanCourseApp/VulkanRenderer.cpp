@@ -40,7 +40,7 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		createSynchronization();
 
 		viewProjection.projection = glm::perspective(glm::radians(45.0f), (float)swapchainExtent.width / (float)swapchainExtent.height, 0.1f, 100.0f);
-		viewProjection.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		viewProjection.view = glm::lookAt(glm::vec3(10.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		viewProjection.projection[1][1] *= -1;
 
@@ -76,6 +76,7 @@ int VulkanRenderer::init(GLFWwindow* newWindow)
 		meshList.push_back(rightRectangle);
 
 		createModel("Models/uh60.obj");
+
 	}
 
 	catch (const std::runtime_error &e)
@@ -582,7 +583,7 @@ void VulkanRenderer::createPushConstantRange()
 	// Define push constant values
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;											// Shader stage push constant will go to
 	pushConstantRange.offset = 0;																		// Offset into given data to pass to push constant
-	pushConstantRange.size = sizeof(TransformationMatrix);																// Size of data being passed
+	pushConstantRange.size = sizeof(ModelTransformationMatrix);																// Size of data being passed
 }
 
 void VulkanRenderer::createGraphicsPipeline()
@@ -1361,27 +1362,32 @@ void VulkanRenderer::recordCommands(uint32_t currentImage)
 	// Bind Pipeline to be used in render pass
 	vkCmdBindPipeline(commandBuffers[currentImage], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-	for (size_t j = 0; j < meshList.size(); j++)
+	for (size_t i = 0; i < modelList.size(); i++)
 	{
-		VkBuffer vertexBuffers[] = { meshList[j].getVertexBuffer() };												// Buffers to bind
-		VkDeviceSize offsets[] = { 0 };																				// Offsets into buffers being bound
+		Model currentModel = modelList[i];
+		glm::mat4 model = currentModel.getModel();
+		vkCmdPushConstants(commandBuffers[currentImage], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::mat4), &model);
 
-		vkCmdBindVertexBuffers(commandBuffers[currentImage], 0, 1, vertexBuffers, offsets);							// Command to bind vertex buffer before drawing with them
-		vkCmdBindIndexBuffer(commandBuffers[currentImage], meshList[j].getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);	// Command to bind index buffer before drawing with them
+		for (size_t j = 0; j < currentModel.getMeshCount(); j++)
+		{
+			VkBuffer vertexBuffers[] = { currentModel.getMesh(j)->getVertexBuffer() };									// Buffers to bind
+			VkDeviceSize offsets[] = { 0 };																				// Offsets into buffers being bound
 
-		// Push constants to given shader stage directly (no buffer)
-		TransformationMatrix meshModel = meshList[j].getModel();
-		vkCmdPushConstants(commandBuffers[currentImage], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(TransformationMatrix), &meshModel);
+			vkCmdBindVertexBuffers(commandBuffers[currentImage], 0, 1, vertexBuffers, offsets);							// Command to bind vertex buffer before drawing with them
+			vkCmdBindIndexBuffer(commandBuffers[currentImage], currentModel.getMesh(j)->getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);	// Command to bind index buffer before drawing with them
 
-		// Package descriptor sets for binding
-		int textureID = meshList[j].getTextureID();
-		std::array<VkDescriptorSet, 2> descriptorSetsToBind = { viewProjectionDescriptorSets[currentImage], textureSamplerDescriptorSets[textureID] };
+			// Package descriptor sets for binding
+			int textureID = currentModel.getMesh(j)->getTextureID();
+			std::array<VkDescriptorSet, 2> descriptorSetsToBind = { viewProjectionDescriptorSets[currentImage], textureSamplerDescriptorSets[textureID] };
 
-		// Bind descriptor sets
-		vkCmdBindDescriptorSets(commandBuffers[currentImage], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, static_cast<uint32_t>(descriptorSetsToBind.size()), descriptorSetsToBind.data(), 0, nullptr);
+			// Bind descriptor sets
+			vkCmdBindDescriptorSets(commandBuffers[currentImage], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, static_cast<uint32_t>(descriptorSetsToBind.size()), descriptorSetsToBind.data(), 0, nullptr);
 
-		// Execute pipeline
-		vkCmdDrawIndexed(commandBuffers[currentImage], meshList[j].getIndexCount(), 1, 0, 0, 0);
+			// Execute pipeline
+			vkCmdDrawIndexed(commandBuffers[currentImage], currentModel.getMesh(j)->getIndexCount(), 1, 0, 0, 0);
+		}
+
+		
 	}
 
 	// End Render Pass

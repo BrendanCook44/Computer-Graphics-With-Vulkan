@@ -123,7 +123,7 @@ void Mesh::setModel(glm::mat4 newModel)
 	model.model = newModel;
 }
 
-TransformationMatrix Mesh::getModel()
+ModelTransformationMatrix Mesh::getModel()
 {
 	return model;
 }

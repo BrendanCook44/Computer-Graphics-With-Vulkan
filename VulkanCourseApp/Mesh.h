@@ -7,7 +7,7 @@
 
 #include "Utilities.h"
 
-struct TransformationMatrix {
+struct ModelTransformationMatrix {
 	glm::mat4 model;
 };
 
@@ -26,7 +26,7 @@ public:
 	void destroyIndexBuffer();
 
 	void setModel(glm::mat4 newModel);
-	TransformationMatrix getModel();
+	ModelTransformationMatrix getModel();
 
 	void setTextureID(int newTextureID);
 	int getTextureID();
@@ -48,7 +48,7 @@ private:
 	VkDeviceMemory indexBufferMemory;
 	void createIndexBuffer(VkQueue transferQueue, VkCommandPool transferCommandPool, std::vector<uint32_t>* indices);
 
-	TransformationMatrix model;
+	ModelTransformationMatrix model;
 	int textureID;
 
 };
