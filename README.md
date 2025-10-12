@@ -38,5 +38,5 @@ The course covers modern Vulkan practices including GPU setup, rendering pipelin
 git clone https://github.com/BrendanCook44/Computer-Graphics-With-Vulkan
 ```
 
-2. Open OpenGLCourseApp.sln
+2. Open VulkanCourseApp.sln
 3. Compile and run the program
