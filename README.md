@@ -9,9 +9,10 @@ The course covers modern Vulkan practices including GPU setup, rendering pipelin
 - Initialize Vulkan
 - GPU Enumeration & Feature Selection
 - Vulkan Validation Layers
+- Surface Configuration
 - Create and Manage a Swapchain
 - Build a Graphics Pipeline with Shaders in SPIR-V
-- Setup Render Pass and Subpasses
+- Render Pass and Subpasses
 - Command Buffers & Queues
 - Loading Vertex and Index Data
 - Descriptor Sets and Push Constants
