@@ -60,8 +60,10 @@ private:
 		VkDevice logicalDevice;
 	} mainDevice;
 
+	// Queues
 	VkQueue graphicsQueue;
 	VkQueue presentationQueue;
+
 	VkSurfaceKHR surface;
 	VkSwapchainKHR swapchain;
 
@@ -69,11 +71,22 @@ private:
 	std::vector<VkFramebuffer> swapchainFramebuffers;
 	std::vector<VkCommandBuffer> commandBuffers;
 
+	// Color Buffer
+	std::vector<VkImage> colorBufferImage;
+	std::vector <VkDeviceMemory> colorBufferImageMemory;
+	std::vector <VkImageView> colorBufferImageView;
+	VkFormat colorBufferFormat;
+
 	// Depth Buffer
-	VkImage depthBufferImage;
+	std::vector<VkImage> depthBufferImage;
+	std::vector <VkDeviceMemory> depthBufferImageMemory;
+	std::vector <VkImageView> depthBufferImageView;
 	VkFormat depthBufferFormat;
-	VkDeviceMemory depthBufferImageMemory;
-	VkImageView depthBufferImageView;
+
+	// Input Attachment
+	VkDescriptorSetLayout inputAttachmentDescriptorSetLayout;
+	VkDescriptorPool inputAttachmentDescriptorPool;
+	std::vector<VkDescriptorSet> inputAttachmentDescriptorSets;
 
 	// View Projection
 	VkDescriptorSetLayout viewProjectionDescriptorSetLayout;
@@ -89,13 +102,17 @@ private:
 
 	// Texture Sampler
 	VkSampler textureSampler;
-	VkDescriptorSetLayout textureSamplerSetLayout;
+	VkDescriptorSetLayout textureSamplerDescriptorSetLayout;
 	VkDescriptorPool textureSamplerDescriptorPool;
 	std::vector<VkDescriptorSet> textureSamplerDescriptorSets;
 
 	// Pipeline
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
+
+	VkPipeline secondPipeline;
+	VkPipelineLayout secondPipelineLayout;
+
 	VkRenderPass renderPass;
 	VkPushConstantRange pushConstantRange;
 
@@ -123,6 +140,7 @@ private:
 	void createDescriptorSetLayout();
 	void createPushConstantRange();
 	void createGraphicsPipeline();
+	void createColorBufferImage();
 	void createDepthBufferImage();
 	void createFramebuffers();
 	void createCommandPool();
@@ -133,8 +151,8 @@ private:
 	void createUniformBuffers();
 	void createDescriptorPool();
 	void createDescriptorSets();
+	void createInputDescriptorSets();
 
-	// Create Functions
 	VkImage createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags useFlags, VkMemoryPropertyFlags propertyFlags, VkDeviceMemory* imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -157,8 +175,6 @@ private:
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 	SwapchainDetails getSwapchainDetails(VkPhysicalDevice device);
 
-	// Allocate Functions
-
 	// Checker Functions
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
@@ -169,9 +185,6 @@ private:
 	VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR> presentationModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &surfaceCapabilities);
 	VkFormat chooseSupportedFormat(const std::vector<VkFormat>& formats, VkImageTiling tiling, VkFormatFeatureFlags featureFlags);
-
-
-
 
 };
 
